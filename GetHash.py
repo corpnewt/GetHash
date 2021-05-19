@@ -25,9 +25,10 @@ while True:
             hashersha1   = hashlib.sha1()
             hashersha256 = hashlib.sha256()
             with open(checked_path,"rb") as f:
-                hashermd5.update(f.read())
-                hashersha1.update(f.read())
-                hashersha256.update(f.read())
+                fread = f.read()
+                hashermd5.update(fread)
+                hashersha1.update(fread)
+                hashersha256.update(fread)
             last_hash["path"]   = checked_path
             last_hash["md5"]    = hashermd5.hexdigest()
             last_hash["sha1"]   = hashersha1.hexdigest()
