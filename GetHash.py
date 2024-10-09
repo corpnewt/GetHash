@@ -35,6 +35,8 @@ def get_size(size, suffix=None, use_1024=False, round_to=2, strip_zeroes=False):
     b = b.rstrip("0") if strip_zeroes else b.ljust(round_to,"0") if round_to > 0 else ""
     return "{:,}{} {}".format(int(a),"" if not b else "."+b,biggest)
 
+TERMINAL_WIDTH = 120 if os.name=="nt" else 80
+
 os.chdir(os.path.abspath(os.path.dirname(os.path.realpath(__file__))))
 u = utils.Utils("GetHash")
 last_hash = {}
@@ -72,11 +74,18 @@ while True:
                     if not fread:
                         break
                     bytes_read += len(fread)
-                    sys.stdout.write("\r\033[K --> {} of {} ({}%)".format(
+                    percent = round(float(bytes_read)/total_bytes*100, 2)
+                    perc_str = " {:.2f}%".format(percent)
+                    bar_width = (TERMINAL_WIDTH // 3)-len(perc_str)
+                    progress = "=" * int(bar_width * (percent/100))
+                    sys.stdout.write("\r\033[K --> {}/{} | {}{}{}".format(
                         get_size(bytes_read),
                         get_size(total_bytes),
-                        int(bytes_read/total_bytes*100)
+                        progress,
+                        " " * (bar_width-len(progress)),
+                        perc_str
                     ))
+                    sys.stdout.flush()
                     hashermd5.update(fread)
                     hashersha1.update(fread)
                     hashersha256.update(fread)
